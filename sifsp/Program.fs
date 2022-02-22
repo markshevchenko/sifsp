@@ -80,6 +80,31 @@ let fixed_point f first_guess =
 let sqrt2 x = fixed_point (fun y -> average y (x / y)) 1.0
 
 
+let cont_frac (n: int -> float) (d: int -> float) k =
+    let rec iter i =
+        if i = k
+        then (n k)/(d k)
+        else (n i)/((d i) + iter (i + 1))
+        
+    iter 1
+    
+    
+let euler_d n =
+    if (n + 1) % 3 = 0
+    then 2.0 * (float n + 1.0) / 3.0
+    else 1.0
+    
+    
+let average_damp (f: float -> float) =
+    fun x -> average x (f x)
+    
+
+let sqrt3 x = fixed_point (average_damp (fun y -> x / y)) 1.0
+
+
+let cube_root x = fixed_point (average_damp (fun y -> x / (y * y))) 1.0
+    
+    
 [<EntryPoint>]
 let main _ =
     printfn $"sqrt 2 = %f{sqrt 2.0}"
@@ -97,4 +122,9 @@ let main _ =
     printfn $"fixed_point (sin y + cos y) 1 = %f{fixed_point (fun y -> sin y + cos y) 1.0}"
     printfn $"sqrt'' 2 = %f{sqrt2 2.0}"
     printfn $"phi = fixed_point (fun x -> 1 + 1/x) 1 = %f{fixed_point (fun x -> 1.0 + 1.0/x) 1.0}"
+    printfn $"1/phi cont_frac (fun i -> 1.0) (fun i -> 1.0) 10 = %f{cont_frac (fun _ -> 1.0) (fun _ -> 1.0) 10}"
+    printfn $"e - 2 = cont_frac (fun i -> 1.0) euler_d 10 = %f{cont_frac (fun _ -> 1.0) euler_d 10}"
+    printfn $"(average_dump square) 10 = %f{(average_damp square) 10.0}"
+    printfn $"sqrt''' 2 = %f{sqrt3 2.0}"
+    printfn $"cube_root 8.0 = %f{cube_root 8.0}"
     0
