@@ -103,8 +103,58 @@ let sqrt3 x = fixed_point (average_damp (fun y -> x / y)) 1.0
 
 
 let cube_root x = fixed_point (average_damp (fun y -> x / (y * y))) 1.0
+
+
+let derive g =
+    let dx = 0.00001
+    
+    fun x -> ((g (x + dx)) - (g x))/dx
     
     
+let newton_transform g =
+    fun x -> x - (g x)/((derive g) x)
+    
+    
+let newton_method g guess =
+    fixed_point (newton_transform g) guess
+
+
+let sqrt4 x =
+    newton_method (fun y -> (y * y - x)) 1.0
+    
+    
+let fixed_point_of_transform g transform guess =
+    fixed_point (transform g) guess
+    
+    
+let sqrt5 x =
+    fixed_point_of_transform (fun y -> x / y) average_damp 1.0
+
+
+let sqrt6 x =
+    fixed_point_of_transform (fun y -> y * y - x) newton_transform 1.0
+    
+    
+let inline double f =
+    fun x -> (f (f x))
+    
+    
+let inline compose f g =
+    fun x -> (f (g x))
+    
+    
+let rec repeated f n =
+    if n = 1
+    then f
+    else f << repeated f (n - 1)
+    
+    
+let smooth f =
+    let dx = 0.00001
+    fun x -> ((f (x - dx)) + (f x) + (f (x + dx)))/3.0
+    
+
+
 [<EntryPoint>]
 let main _ =
     printfn $"sqrt 2 = %f{sqrt 2.0}"
@@ -127,4 +177,10 @@ let main _ =
     printfn $"(average_dump square) 10 = %f{(average_damp square) 10.0}"
     printfn $"sqrt''' 2 = %f{sqrt3 2.0}"
     printfn $"cube_root 8.0 = %f{cube_root 8.0}"
+    printfn $"(derive cube) 5 = %f{(derive cube) 5.0}"
+    printfn $"sqrt'''' 2 = %f{sqrt4 2.0}"
+    printfn $"double ((+)1) 5 = %d{double ((+)1) 5}"
+    printfn $"compose square ((+)1) 6=%d{compose square ((+)1) 6}"
+    printfn $"(square << ((+)1)) 6 = %d{(square << ((+)1)) 6}"
+    printfn $"(repeated square 2) 5 = %d{(repeated square 2) 5}"
     0
