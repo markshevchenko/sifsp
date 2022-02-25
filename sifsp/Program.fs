@@ -1,4 +1,7 @@
 ﻿open System
+open Deriv
+
+// Chapter 1
 
 let inline square x = x * x
 let inline cube x = x * x * x
@@ -127,12 +130,10 @@ let fixed_point_of_transform g transform guess =
     fixed_point (transform g) guess
     
     
-let sqrt5 x =
-    fixed_point_of_transform (fun y -> x / y) average_damp 1.0
+let sqrt5 x = fixed_point_of_transform (fun y -> x / y) average_damp 1.0
 
 
-let sqrt6 x =
-    fixed_point_of_transform (fun y -> y * y - x) newton_transform 1.0
+let sqrt6 x = fixed_point_of_transform (fun y -> y * y - x) newton_transform 1.0
     
     
 let inline double f =
@@ -154,6 +155,68 @@ let smooth f =
     fun x -> ((f (x - dx)) + (f x) + (f (x + dx)))/3.0
     
 
+// let fourth_root x = fixed_point_of_transform (fun y -> x / (y * y * y)) average_damp 1.0
+let fourth_root x = fixed_point_of_transform (fun y -> x / (y * y * y)) (repeated average_damp 2) 1.0
+
+
+// Chapter 2
+
+//let make_rat (n: int) d =
+//    fun case -> if case then n else d
+
+let make_rat (n: int) d =
+    let dispatch case =
+        if case then n else d
+        
+    dispatch
+    
+let numer r = (r true)
+let denom r = (r false)
+
+
+//let zero = fun _ -> id
+//let add_1 n = fun f -> fun x -> (f ((n f) x))
+
+type List<'a> =
+    | Nil
+    | Node of 'a * List<'a>
+    
+let cons element list =
+    List.Node (element, list)
+    
+let rec length list =
+    match list with
+    | Nil -> 0
+    | Node (_, tail) -> 1 + (length tail)
+
+let rec contains (value: 'a when 'a : equality) list =
+    match list with
+    | Nil -> false
+    | Node (head, tail) -> if head = value
+                           then true
+                           else contains value tail                           
+                           
+let rec filter predicate list =
+    match list with
+    | Nil -> Nil
+    | Node (head, tail) -> if predicate head
+                           then cons head (filter predicate tail)
+                           else filter predicate tail
+                           
+let rec for_all handler list =
+    match list with
+    | Nil -> ()
+    | Node (head, tail) -> handler head
+                           for_all handler tail
+                           
+let print list =
+    match list with
+    | Nil -> ()
+    | Node (head, tail) -> printf "%d" head
+                           for_all (printf ", %d") tail
+                           
+    printfn ""
+    
 
 [<EntryPoint>]
 let main _ =
@@ -183,4 +246,14 @@ let main _ =
     printfn $"compose square ((+)1) 6=%d{compose square ((+)1) 6}"
     printfn $"(square << ((+)1)) 6 = %d{(square << ((+)1)) 6}"
     printfn $"(repeated square 2) 5 = %d{(repeated square 2) 5}"
+    printfn $"fourth_root 625.0 = %f{fourth_root 625.0}"
+    printfn $"numer (make-rat 3 4) = %d{numer (make_rat 3 4)}"
+    printfn $"denom (make-rat 3 4) = %d{denom (make_rat 3 4)}"
+//    printfn $"(zero ()) 0 = %d{(zero ()) 0}"
+//    printfn $"((add_1 zero) ((+)1)) 0 = %d{((add_1 zero) ((+)1)) 0}"
+    let list = (cons 1 (cons 2 (cons 3 (cons 4 (cons 5 (cons 6 Nil)))))) 
+    print list
+    list |> filter (fun n -> n % 2 = 0) |> print
+    printfn $"%A{<@ fun (x: float) -> x * x @>}"
+    printfn $"%A{deriv <@ fun (x: float) -> x * x @>}"
     0
