@@ -274,5 +274,5 @@ let main _ =
     pi_summands 1.0 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pi summands: %s"
     pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pi_stream: %s"
     euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "euler_transform  pi_stream: %s"
-//    accelerated_sequence euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "accelerated_sequence euler_transform  pi_stream: %s"
+    accelerated_sequence euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "accelerated_sequence euler_transform  pi_stream: %s"
     0

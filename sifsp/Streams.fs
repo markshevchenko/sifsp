@@ -122,7 +122,8 @@ let inline partial_sums< ^a when ^a: (static member (+): ^a * ^a -> ^a)> (stream
 let rec pi_summands n =
     seq {
         yield 1.0/n
-        yield! pi_summands (n + 2.0) |> Seq.map (fun x -> -x)
+//        yield! pi_summands (n + 2.0) |> Seq.map (fun x -> -x)
+        yield! pi_summands (n + 2.0) |> Seq.map (~-)
     }
 
 
@@ -130,18 +131,20 @@ let pi_stream = pi_summands 1.0 |> partial_sums |> Seq.map (fun x -> 4.0 * x)
 
 
 let rec euler_transform (stream: float seq) = seq {
-    let s0 = Seq.item 0 stream
-    let s1 = Seq.item 1 stream
-    let s2 = Seq.item 2 stream
+    let cache = Seq.cache stream
+    let s0 = Seq.item 0 cache
+    let s1 = Seq.item 1 cache
+    let s2 = Seq.item 2 cache
     yield s2 - (s2 - s1) * (s2 - s1)/(s0 - 2.0 * s1 + s2)
-    yield! euler_transform (Seq.tail stream)
+    yield! euler_transform (Seq.tail cache)
 }
 
 
-let rec make_tableau transform (stream: float seq) = seq {
-    yield stream
-    yield! make_tableau transform (transform stream)
-}
+let rec make_tableau (transform: float seq -> float seq) (stream: float seq) = seq {
+        yield stream
+        yield! make_tableau transform (transform stream)
+    }
+
 
 let accelerated_sequence transform stream =
     stream |> make_tableau transform |> Seq.map Seq.head
