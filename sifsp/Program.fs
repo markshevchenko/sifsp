@@ -1,5 +1,6 @@
 ﻿open System
 open Deriv
+open Streams
 
 // Chapter 1
 
@@ -249,11 +250,29 @@ let main _ =
     printfn $"fourth_root 625.0 = %f{fourth_root 625.0}"
     printfn $"numer (make-rat 3 4) = %d{numer (make_rat 3 4)}"
     printfn $"denom (make-rat 3 4) = %d{denom (make_rat 3 4)}"
+
 //    printfn $"(zero ()) 0 = %d{(zero ()) 0}"
 //    printfn $"((add_1 zero) ((+)1)) 0 = %d{((add_1 zero) ((+)1)) 0}"
+    
     let list = (cons 1 (cons 2 (cons 3 (cons 4 (cons 5 (cons 6 Nil)))))) 
     print list
     list |> filter (fun n -> n % 2 = 0) |> print
     printfn $"%A{<@ fun (x: float) -> x * x @>}"
     printfn $"%A{deriv <@ fun (x: float) -> x * x @>}"
+
+    printfn $"bigint_sqrt 1000000I = %A{bigint_sqrt 1000000I}"
+    integers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "integers: %s" 
+    fibs |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "fibs: %s"
+    primes |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "primes: %s"
+    primes1 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "primes': %s"
+    ones |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "ones: %s"
+    integers1 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "integers': %s" 
+    fibs1 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "fibs': %s"
+    two_pows |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "2 pows': %s"
+    sqrt_stream 2.0 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "sqrt_stream: %s"
+    partial_sums integers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "partials_sums integers: %s"
+    pi_summands 1.0 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pi summands: %s"
+    pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pi_stream: %s"
+    euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "euler_transform  pi_stream: %s"
+//    accelerated_sequence euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "accelerated_sequence euler_transform  pi_stream: %s"
     0

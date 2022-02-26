@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <Compile Include="Deriv.fs" />
+      <Compile Include="Streams.fs" />
       <Compile Include="Program.fs" />
     </ItemGroup>
 
