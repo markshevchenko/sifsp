@@ -275,4 +275,5 @@ let main _ =
     pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pi_stream: %s"
     euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "euler_transform  pi_stream: %s"
     accelerated_sequence euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "accelerated_sequence euler_transform  pi_stream: %s"
+    pairs integers integers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pairs integers integers = %s"
     0

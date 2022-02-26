@@ -148,3 +148,19 @@ let rec make_tableau (transform: float seq -> float seq) (stream: float seq) = s
 
 let accelerated_sequence transform stream =
     stream |> make_tableau transform |> Seq.map Seq.head
+
+
+let rec interleave (s1: 'a seq) (s2: 'a seq) = seq {
+    if Seq.isEmpty s1
+    then yield! s2
+    else
+        yield Seq.head s1
+        yield! interleave s2 (Seq.tail s1)
+}
+
+
+let rec pairs (s1: 'a seq) (s2: 'a seq) = seq {
+    let cache2 = Seq.cache s2
+    yield (Seq.head s1, Seq.head cache2)
+    yield! interleave (cache2 |> Seq.tail |> Seq.map (fun e -> (Seq.head s1, e))) (pairs (Seq.tail s1) (Seq.tail cache2))
+}
