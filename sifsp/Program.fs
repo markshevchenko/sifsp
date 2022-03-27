@@ -268,7 +268,7 @@ let main _ =
     ones |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "ones: %s"
     integers1 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "integers': %s" 
     fibs1 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "fibs': %s"
-    two_pows |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "2 pows': %s"
+    two_powers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "2 powers': %s"
     sqrt_stream 2.0 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "sqrt_stream: %s"
     partial_sums integers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "partials_sums integers: %s"
     pi_summands 1.0 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pi summands: %s"

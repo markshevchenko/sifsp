@@ -91,7 +91,7 @@ let fibs1 =
     gen ()
     
     
-let two_pows =
+let two_powers =
     let rec gen () = seq {
         yield 1I
         yield! gen () |> Seq.map (fun i -> 2I * i)
@@ -141,10 +141,9 @@ let rec euler_transform (stream: float seq) = seq {
 
 
 let rec make_tableau (transform: float seq -> float seq) (stream: float seq) = seq {
-        yield stream
-        yield! make_tableau transform (transform stream)
-    }
-
+    yield stream
+    yield! make_tableau transform (transform stream)
+}
 
 let accelerated_sequence transform stream =
     stream |> make_tableau transform |> Seq.map Seq.head
