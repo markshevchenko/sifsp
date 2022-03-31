@@ -36,12 +36,12 @@ let fact n = fact_iter 1I 1 n
 let is_even n = n % 2 = 0
 
 
-let rec fast_expt b n : bigint =
+let rec fast_power b n : bigint =
     if n = 1
     then 1I
     else if is_even n
-         then square (fast_expt b (n / 2))
-         else b * fast_expt b (n - 1)
+         then square (fast_power b (n / 2))
+         else b * fast_power b (n - 1)
 
 
 let integral f a b dx =
@@ -68,7 +68,7 @@ let half_interval_method f a b =
     then search f a b
     else if b_value < LanguagePrimitives.GenericZero && a_value > LanguagePrimitives.GenericZero
     then search f b a
-    else failwith "У аргументов не разные знаки"
+    else failwith "Parameters have different signs"
 
 
 let fixed_point f first_guess =
@@ -172,8 +172,8 @@ let make_rat (n: int) d =
         
     dispatch
     
-let numer r = (r true)
-let denom r = (r false)
+let numerator r = (r true)
+let denominator r = (r false)
 
 
 //let zero = fun _ -> id
@@ -214,7 +214,7 @@ let rec for_all handler list =
 let print list =
     match list with
     | Nil -> ()
-    | Node (head, tail) -> printf "%d" head
+    | Node (head, tail) -> printf $"%d{head}"
                            for_all (printf ", %d") tail
                            
     printfn ""
@@ -225,7 +225,7 @@ let main _ =
     printfn $"sqrt 2 = %f{sqrt 2.0}"
     printfn $"sqrt' 2 = %f{sqrt1 2.0}"
     printfn $"20! = %A{fact 20}"
-    printfn $"3 ^ 100 = %A{fast_expt 3I 100}"
+    printfn $"3 ^ 100 = %A{fast_power 3I 100}"
     printfn $"sum 1..100 = %d{seq { 1..100 } |> Seq.sum}"
     printfn $"sum_cubes 1..10 = %d{seq { 1..10 } |> Seq.map cube |> Seq.sum}"
     printfn $"pi_sum = %f{8.0 * (seq { 1.0 .. 4.0 .. 1001.0 }
@@ -249,12 +249,9 @@ let main _ =
     printfn $"(square << ((+)1)) 6 = %d{(square << ((+)1)) 6}"
     printfn $"(repeated square 2) 5 = %d{(repeated square 2) 5}"
     printfn $"fourth_root 625.0 = %f{fourth_root 625.0}"
-    printfn $"numer (make-rat 3 4) = %d{numer (make_rat 3 4)}"
-    printfn $"denom (make-rat 3 4) = %d{denom (make_rat 3 4)}"
+    printfn $"numerator (make-rat 3 4) = %d{numerator (make_rat 3 4)}"
+    printfn $"denominator (make-rat 3 4) = %d{denominator (make_rat 3 4)}"
 
-//    printfn $"(zero ()) 0 = %d{(zero ()) 0}"
-//    printfn $"((add_1 zero) ((+)1)) 0 = %d{((add_1 zero) ((+)1)) 0}"
-    
     let list = (cons 1 (cons 2 (cons 3 (cons 4 (cons 5 (cons 6 Nil)))))) 
     print list
     list |> filter (fun n -> n % 2 = 0) |> print

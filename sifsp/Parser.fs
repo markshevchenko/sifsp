@@ -25,16 +25,16 @@ let repeated1 parser chars =
                          Some (result::results), cs
     | None, chars -> None, chars
     
-let map f parser chars =
+let map mapper parser chars =
     let result, cs = parser chars
-    Option.map f result, cs
+    Option.map mapper result, cs
     
 let digits = whereChar Char.IsDigit |> repeated1 |> map (String.concat "")
 
-let (.>.) parser1 parser2 f chars =
+let (.>.) parser1 parser2 combinator chars =
     match parser1 chars with
     | Some s1, cs1 -> match parser2 cs1 with
-                      | Some s2, cs2 -> Some (f s1  s2), cs2
+                      | Some s2, cs2 -> Some (combinator s1  s2), cs2
                       | _ -> None, chars
     | _ -> None, chars
 
@@ -67,10 +67,10 @@ let (<|>) parser1 parser2 chars =
     
 let rec value chars = (number
                    <|> (isChar '(' >>. expression .>> isChar ')')
-                   <|> (isChar 's' >>. isChar 'i' >>. isChar 'n' .>. value) (fun _ -> sin)) chars
+                   <|> (isChar 's' >>. isChar 'i' >>. isChar 'n' >>. value |> map sin)) chars
 and star = isChar '*' >>. value
-and slash = (isChar '/' .>. value) (fun _ x -> 1.0/x)
+and slash = isChar '/' >>. value |> map ((/)1.0)
 and term = (value .>. repeated0 (star <|> slash)) (fun v vs -> v * List.fold (*) 1.0 vs)
 and plus = isChar '+' >>. term
-and minus = (isChar '-' .>. term) (fun _ x -> -x)
+and minus = isChar '-' >>. term |> map (~-)
 and expression = (term .>. repeated0 (plus <|> minus)) (fun v vs -> v + List.sum vs) 
