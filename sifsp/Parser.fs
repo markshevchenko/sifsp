@@ -2,68 +2,75 @@ module Parser
 
 open System
 open System.Globalization
-open System.Text
 
-let pch predicate = function
+let whereChar predicate = function
     | c::cs when predicate c -> Some (c.ToString()), cs
-    | chars -> None, chars
+    | cs -> None, cs
     
-let ch c = pch ((=) c)
+let isChar c = whereChar ((=) c)
 
-let rec internal repeat parser accumulator combine chars =
+let rec internal repeated parser chars =
     match parser chars with
-    | Some s, cs -> repeat parser (combine accumulator s) combine cs
-    | None, cs -> accumulator, cs
+    | Some result, cs -> let results, cs = repeated parser cs 
+                         result::results, cs
+    | None, _ -> [], chars
+    
+let repeated0 parser chars =
+    let results, cs = repeated parser chars
+    Some results, cs
+    
+let repeated1 parser chars =
+    match parser chars with
+    | Some result, cs -> let results, cs = repeated parser cs
+                         Some (result::results), cs
+    | None, chars -> None, chars
+    
+let map f parser chars =
+    let result, cs = parser chars
+    Option.map f result, cs
+    
+let digits = whereChar Char.IsDigit |> repeated1 |> map (String.concat "")
 
-let rep1 (parser: char list -> string option * char list) chars =
-    match parser chars with
-    | Some s, cs -> let mutable stringBuilder = StringBuilder(s)
-                    let stringBuilder, cs = repeat parser stringBuilder (fun stringBuilder -> stringBuilder.Append) cs
-                    Some (stringBuilder.ToString()), cs
-    | none -> none
-    
-let opt parser defaultValue chars =
-    match parser chars with
-    | Some s, cs -> Some s, cs
-    | None, cs -> Some defaultValue, cs
-    
-let (.>>.) (parser1: char list -> 'a option * char list)
-           (parser2: char list -> 'b option * char list)
-           (f: 'a -> 'b -> 'c)
-           (chars: char list): ('c option * char list) =
+let (.>.) parser1 parser2 f chars =
     match parser1 chars with
     | Some s1, cs1 -> match parser2 cs1 with
                       | Some s2, cs2 -> Some (f s1  s2), cs2
                       | _ -> None, chars
     | _ -> None, chars
+
+let optional defaultValue parser chars =
+    match parser chars with
+    | Some s, cs -> Some s, cs
+    | None, cs -> Some defaultValue, cs
     
-let map (parser: char list -> 'a option * char list) (f: 'a -> 'b) chars =
-    let result, cs = parser chars
-    Option.map f result, cs
-    
-let digits = rep1 (pch Char.IsDigit)
-let frac = opt ((ch '.' .>>. digits) (+)) ""
-let number = map ((digits .>>. frac) (+)) (fun s -> Convert.ToDouble(s, CultureInfo.InvariantCulture))
+let number = (digits .>. ((isChar '.' .>. digits) (+) |> optional "")) (+)
+          |> map (fun s -> Convert.ToDouble(s, CultureInfo.InvariantCulture))
+          
+let (>>.) parser1 parser2 chars =
+    match parser1 chars with
+    | Some _, cs1 -> match parser2 cs1 with
+                     | Some result2, cs2 -> Some result2, cs2
+                     | _ -> None, chars
+    | _ -> None, chars
+
+let (.>>) parser1 parser2 chars =
+    match parser1 chars with
+    | Some result1, cs1 -> match parser2 cs1 with
+                           | Some _, cs2 -> Some result1, cs2
+                           | _ -> None, chars
+    | _ -> None, chars
 
 let (<|>) parser1 parser2 chars =
     match parser1 chars with
     | Some result, cs -> Some result, cs
-    | None, cs -> parser2 chars
+    | None, cs -> parser2 cs
     
-let star = (ch '*' .>>. number) (fun _ -> id)
-let slash = (ch '/' .>>. number) (fun _ x -> 1.0/x)
-
-let factors chars =
-    match number chars with
-    | Some value, cs -> let value, cs = repeat (star <|> slash) value (*) cs
-                        Some value, cs
-    | None, cs -> None, cs
-    
-let plus = (ch '+' .>>. factors) (fun _ -> id)
-let minus = (ch '-' .>>. factors) (fun _ x -> -x)
-
-let terms chars =
-    match factors chars with
-    | Some value, cs -> let value, cs = repeat (plus <|> minus) value (+) cs
-                        Some value, cs
-    | None, cs -> None, cs
+let rec value chars = (number
+                   <|> (isChar '(' >>. expression .>> isChar ')')
+                   <|> (isChar 's' >>. isChar 'i' >>. isChar 'n' .>. value) (fun _ -> sin)) chars
+and star = isChar '*' >>. value
+and slash = (isChar '/' .>. value) (fun _ x -> 1.0/x)
+and term = (value .>. repeated0 (star <|> slash)) (fun v vs -> v * List.fold (*) 1.0 vs)
+and plus = isChar '+' >>. term
+and minus = (isChar '-' .>. term) (fun _ x -> -x)
+and expression = (term .>. repeated0 (plus <|> minus)) (fun v vs -> v + List.sum vs) 
