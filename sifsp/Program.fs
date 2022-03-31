@@ -1,6 +1,7 @@
 ﻿open System
 open Deriv
 open Streams
+open Parser
 
 // Chapter 1
 
@@ -276,4 +277,18 @@ let main _ =
     euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "euler_transform  pi_stream: %s"
     accelerated_sequence euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "accelerated_sequence euler_transform  pi_stream: %s"
     pairs integers integers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pairs integers integers = %s"
+    
+    "3.14159265" |> List.ofSeq |> number |> printfn "%A"
+    "321" |> List.ofSeq |> number |> printfn "%A"
+    "+3.14159265" |> List.ofSeq |> plus |> printfn "%A"
+    "-3.14159265" |> List.ofSeq |> minus |> printfn "%A"
+    "*3.14159265" |> List.ofSeq |> star |> printfn "%A"
+    "/3.14159265" |> List.ofSeq |> slash |> printfn "%A"
+    "1*2*3/4" |> List.ofSeq |> factors |> printfn "%A"
+    "1*2+3*4" |> List.ofSeq |> terms |> printfn "%A"
+                 
+//    "1+2*3" |> List.ofSeq
+//            |> expression
+//            |> printfn "%A"
+
     0
