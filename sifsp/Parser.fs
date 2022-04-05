@@ -31,6 +31,8 @@ let map mapper parser chars =
     
 let digits = whereChar Char.IsDigit |> repeated1 |> map (String.concat "")
 
+    //"321" |> List.ofSeq |> digits |> printfn "%A"
+
 let (.>.) parser1 parser2 combinator chars =
     match parser1 chars with
     | Some s1, cs1 -> match parser2 cs1 with
@@ -46,6 +48,9 @@ let optional defaultValue parser chars =
 let number = (digits .>. ((isChar '.' .>. digits) (+) |> optional "")) (+)
           |> map (fun s -> Convert.ToDouble(s, CultureInfo.InvariantCulture))
           
+    //"321" |> List.ofSeq |> number |> printfn "%A"
+    //"3.14159265" |> List.ofSeq |> number |> printfn "%A"
+
 let (>>.) parser1 parser2 chars =
     match parser1 chars with
     | Some _, cs1 -> match parser2 cs1 with
@@ -65,12 +70,23 @@ let (<|>) parser1 parser2 chars =
     | Some result, cs -> Some result, cs
     | None, cs -> parser2 cs
     
+//let rec value chars = (number
+//                   <|> (isChar '(' >>. expression .>> isChar ')')
+//                   <|> (isChar 's' >>. isChar 'i' >>. isChar 'n' >>. value |> map sin)) chars
 let rec value chars = (number
-                   <|> (isChar '(' >>. expression .>> isChar ')')
-                   <|> (isChar 's' >>. isChar 'i' >>. isChar 'n' >>. value |> map sin)) chars
+                   <|> (isChar '(' >>. expression .>> isChar ')')) chars
 and star = isChar '*' >>. value
 and slash = isChar '/' >>. value |> map ((/)1.0)
 and term = (value .>. repeated0 (star <|> slash)) (fun v vs -> v * List.fold (*) 1.0 vs)
 and plus = isChar '+' >>. term
 and minus = isChar '-' >>. term |> map (~-)
 and expression = (term .>. repeated0 (plus <|> minus)) (fun v vs -> v + List.sum vs) 
+
+    //"+3.14159265" |> List.ofSeq |> plus |> printfn "%A"
+    //"-3.14159265" |> List.ofSeq |> minus |> printfn "%A"
+    //"*3.14159265" |> List.ofSeq |> star |> printfn "%A"
+    //"/3.14159265" |> List.ofSeq |> slash |> printfn "%A"
+    //"1*2*3/4" |> List.ofSeq |> expression |> printfn "%A"
+    //"1*2+3*4" |> List.ofSeq |> expression |> printfn "%A"
+    //"1*(2+3)*4" |> List.ofSeq |> expression |> printfn "%A"
+//    //"sin(3.1415/6)" |> List.ofSeq |> expression |> printfn "%A"

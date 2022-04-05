@@ -323,6 +323,6 @@ let main _ =
     "1*2*3/4" |> List.ofSeq |> expression |> printfn "%A"
     "1*2+3*4" |> List.ofSeq |> expression |> printfn "%A"
     "1*(2+3)*4" |> List.ofSeq |> expression |> printfn "%A"
-    "sin(3.1415/6)" |> List.ofSeq |> expression |> printfn "%A"
+//    "sin(3.1415/6)" |> List.ofSeq |> expression |> printfn "%A"
 
     0
