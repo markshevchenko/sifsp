@@ -13,6 +13,7 @@ let integers =
 
     gen 1I
 
+    //integers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "integers: %s" 
 
 let fibs =
     let rec gen a b =
@@ -23,6 +24,7 @@ let fibs =
         
     gen 0I 1I
     
+    //fibs |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "fibs: %s"
     
 let rec bigint_sqrt n =
     if n < 0I then failwith "n can't be negative"
@@ -33,6 +35,7 @@ let rec bigint_sqrt n =
         if large * large > n then small
         else large
 
+    //printfn $"bigint_sqrt 1000000I = %A{bigint_sqrt 1000000I}"
 
 let is_prime n =
     if n <= 1I
@@ -48,6 +51,7 @@ let is_prime n =
 
 let primes = integers |> Seq.filter is_prime
 
+    //primes |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "primes: %s"
 
 let primes1 =
     let rec gen stream =
@@ -61,7 +65,9 @@ let primes1 =
         
     gen (Seq.skip 1 integers)
     
-    
+
+    //primes1 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "primes': %s"
+
 let ones =
     let rec gen () =
         seq {
@@ -71,6 +77,7 @@ let ones =
         
     gen ()
     
+    //ones |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "ones: %s"
     
 let integers1 =
     let rec gen () = seq {
@@ -80,6 +87,7 @@ let integers1 =
 
     gen ()
     
+    //integers1 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "integers': %s" 
     
 let fibs1 =
     let rec gen () = seq {
@@ -90,6 +98,7 @@ let fibs1 =
     
     gen ()
     
+    //fibs1 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "fibs': %s"
     
 let two_powers =
     let rec gen () = seq {
@@ -99,6 +108,7 @@ let two_powers =
     
     gen ()
     
+    //two_powers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "2 powers': %s"
     
 let sqrt_stream x =
     let improve guess x = (guess + x/guess)/2.0
@@ -107,8 +117,9 @@ let sqrt_stream x =
         yield! gen () |> Seq.map (fun guess -> improve guess x)
     }
     
-    gen()
+    gen ()
     
+    //sqrt_stream 2.0 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "sqrt_stream: %s"
     
 let inline partial_sums< ^a when ^a: (static member (+): ^a * ^a -> ^a)> (stream: ^a seq) =
     let rec gen stream = seq {
@@ -118,6 +129,7 @@ let inline partial_sums< ^a when ^a: (static member (+): ^a * ^a -> ^a)> (stream
     
     gen stream
     
+    //partial_sums integers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "partials_sums integers: %s"
     
 let rec pi_summands n =
     seq {
@@ -126,9 +138,11 @@ let rec pi_summands n =
         yield! pi_summands (n + 2.0) |> Seq.map (~-)
     }
 
+    //pi_summands 1.0 |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pi summands: %s"
 
 let pi_stream = pi_summands 1.0 |> partial_sums |> Seq.map (fun x -> 4.0 * x)
 
+    //pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "pi_stream: %s"
 
 let rec euler_transform (stream: float seq) = seq {
     let cache = Seq.cache stream
@@ -139,6 +153,7 @@ let rec euler_transform (stream: float seq) = seq {
     yield! euler_transform (Seq.tail cache)
 }
 
+    //euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "euler_transform  pi_stream: %s"
 
 let rec make_tableau (transform: float seq -> float seq) (stream: float seq) = seq {
     yield stream
@@ -148,6 +163,7 @@ let rec make_tableau (transform: float seq -> float seq) (stream: float seq) = s
 let accelerated_sequence transform stream =
     stream |> make_tableau transform |> Seq.map Seq.head
 
+    //accelerated_sequence euler_transform pi_stream |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "accelerated_sequence euler_transform  pi_stream: %s"
 
 let rec interleave (s1: 'a seq) (s2: 'a seq) = seq {
     if Seq.isEmpty s1
