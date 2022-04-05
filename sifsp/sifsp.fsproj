@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Include="Functions.fsx" />
+      <None Include="Streams.fsx" />
+      <None Include="Deriv.fsx" />
+      <None Include="Parser.fsx" />
       <Compile Include="Deriv.fs" />
       <Compile Include="Streams.fs" />
       <Compile Include="Parser.fs" />
