@@ -8,8 +8,11 @@ let integers =
         }
 
     gen 1I
+    
+let print title = Seq.take 10 >> Seq.map string >> String.concat ", " >> printfn "%s: %s" title
 
-integers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "integers: %s" 
+//integers |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "integers: %s"
+print "integers" integers
 
 let fibs =
     let rec gen a b =
@@ -20,7 +23,8 @@ let fibs =
         
     gen 0I 1I
     
-fibs |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "fibs: %s"
+//fibs |> Seq.take 10 |> Seq.map string |> String.concat ", " |> printfn "fibs: %s"
+print "fibs" fibs
     
 let rec bigint_sqrt n =
     if n < 0I then failwith "n can't be negative"

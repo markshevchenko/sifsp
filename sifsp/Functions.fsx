@@ -30,12 +30,18 @@ let sqrt1 x =
 sqrt 2.0
 sqrt1 2.0
 
+//let rec fact n =
+//    if n = 0 then 1I
+//    else (bigint n) * fact (n - 1)
+
 let rec fact_iter product (counter: int) max_count =
     if counter > max_count
     then product
     else fact_iter (product * bigint counter) (counter + 1) max_count
 
-let fact n = fact_iter 1I 1 n
+//let fact n = fact_iter 1I 1 n
+
+let fact n = seq { 1 .. n } |> Seq.map bigint |> Seq.fold (*) 1I
 
 fact 20
 
