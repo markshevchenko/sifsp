@@ -35,7 +35,11 @@ let rec fact_iter product (counter: int) max_count =
 
 let fact n = fact_iter 1I 1 n
 
-    //printfn $"20! = %A{fact 20}"
+fact 20
+
+let fact2 n = seq { 1 .. n } |> Seq.map bigint |> Seq.fold (*) 1I
+
+fact2 20
 
 let is_even n = n % 2 = 0
 

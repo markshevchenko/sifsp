@@ -4,6 +4,7 @@ square 2
 square 4.0
 
 let inline cube x = x * x * x
+
 cube 3
 cube 5.0
 
@@ -40,12 +41,13 @@ fact 20
 
 let is_even n = n % 2 = 0
 
-let rec fast_power b n : bigint =
-    if n = 1
-    then 1I
-    else if is_even n
-         then square (fast_power b (n / 2))
-         else b * fast_power b (n - 1)
+let rec fast_power_iter result factor n =
+    if n = 0 then result
+    else if is_even n then fast_power_iter result (square factor) (n / 2)
+    else fast_power_iter (result * factor) factor (n - 1)
+
+let rec fast_power b n =
+    fast_power_iter 1I b n
          
 fast_power 3I 100
 
@@ -82,17 +84,16 @@ half_interval_method sin 4.0 2.0
 let fixed_point f first_guess =
     let rec try_guess guess =
         let next = f guess
-        if (abs (guess - next)) < 0.00001
-        then next
+        if (abs (guess - next)) < 0.00001 then next
         else try_guess next
 
     try_guess first_guess
 
 fixed_point cos 1.0
-fixed_point (fun y -> sin y + cos y) 1.0
+fixed_point (fun x -> sin x + cos x) 1.0
 fixed_point (fun x -> 1.0 + 1.0/x) 1.0
     
-// let sqrt2 x = fixed_point (fun y -> x / y) 1.0
+//let sqrt2 x = fixed_point (fun y -> x / y) 1.0
 let sqrt2 x = fixed_point (fun y -> average y (x / y)) 1.0
 
 sqrt2 2.0
@@ -123,12 +124,16 @@ let newton_method f guess =
     fixed_point (newton_transform f) guess
 
 
-let sqrt4 x = newton_method (fun y -> (y * y - x)) 1.0
+let sqrt4 z = newton_method (fun x -> (square x - z)) 1.0
     
 sqrt4 2.0
+
+let cube_root2 z = newton_method (fun x -> (cube x - z)) 1.0
+
+cube_root2 8.0
     
-let fixed_point_of_transform g transform guess =
-    fixed_point (transform g) guess
+let fixed_point_of_transform f transform guess =
+    fixed_point (transform f) guess
     
     
 let sqrt5 x = fixed_point_of_transform (fun y -> x / y) average_damp 1.0
@@ -137,7 +142,7 @@ sqrt5 2.0
 
 let sqrt6 x = fixed_point_of_transform (fun y -> y * y - x) newton_transform 1.0
 
-sqrt6 2.0    
+sqrt6 2.0
     
 let inline double f =
     fun x -> (f (f x))
@@ -150,15 +155,15 @@ let inline compose f g =
 compose square ((+)1) 6
 (square << ((+)1)) 6
     
-let rec repeated f n =
+let rec repeate f n =
     if n = 1
     then f
-    else f >> repeated f (n - 1)
+    else f >> repeate f (n - 1)
     
-(repeated square 2) 5
+(repeate square 2) 5
     
 // let fourth_root x = fixed_point_of_transform (fun y -> x / (y * y * y)) average_damp 1.0
-let fourth_root x = fixed_point_of_transform (fun y -> x / (y * y * y)) (repeated average_damp 2) 1.0
+let fourth_root x = fixed_point_of_transform (fun y -> x / cube y) (repeate average_damp 2) 1.0
 
 fourth_root 625.0
 

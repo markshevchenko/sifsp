@@ -4,7 +4,9 @@
 // Chapter 1
 
 double square(double x) { return x * x; }
+
 double cube(double x) { return x * x * x; }
+
 double average(double a, double b) { return (a + b) / 2; }
 
 double sqrt1(double x)
@@ -15,6 +17,34 @@ double sqrt1(double x)
         guess = average(guess, x / guess);
 
     return guess;
+}
+
+double fact(unsigned n)
+{
+    double result = 1;
+
+    while (n > 0) {
+        result *= n;
+        n--;
+    }
+
+    return result;
+}
+
+double fast_power(double base, unsigned n)
+{
+    double result = 1;
+    double factor = base;
+
+    while (n > 0) {
+        if (n % 2 == 1)
+            result *= factor;
+
+        factor *= factor;
+        n /= 2;
+    }
+
+    return result;
 }
 
 double integral(double (*f)(double), double a, double b, double dx)
@@ -70,6 +100,8 @@ int main()
     printf("cube(2) = %f\n", cube(2));
     printf("average(1, 2 / 1) = %f\n", average(1, 2 / 1));
     printf("sqrt1(2) = %f\n", sqrt1(2));
+    printf("fact(10) = %f\n", fact(10));
+    printf("fast_power(2, 10) = %f\n", fast_power(2, 10));
     printf("integral(cube, 0, 1, 0.01) = %f\n", integral(cube, 0, 1, 0.01));
     printf("pi = search_zero(sin, 2, 4) = %f\n", search_zero(sin, 2, 4));
     printf("fixed_point(cos, 1) = %f\n", fixed_point(cos, 1));
