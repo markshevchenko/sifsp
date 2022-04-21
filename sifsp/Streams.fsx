@@ -57,15 +57,11 @@ let rec bigint_sqrt n =
 bigint_sqrt 1000000I
 
 let is_prime n =
-    if n <= 1I
-    then false
-    else if n = 2I
-    then true
-    else if n % 2I = 0I
-    then false
-    else
-        let sqrt_n = bigint_sqrt n
-        { 3I..sqrt_n } |> Seq.forall (fun c -> n % c <> 0I)
+    if n <= 1I then false
+    else if n = 2I then true
+    else if n % 2I = 0I then false
+    else let sqrt_n = bigint_sqrt n
+         { 3I..sqrt_n } |> Seq.forall (fun c -> n % c <> 0I)
 
 is_prime 7I
 is_prime 1001I
@@ -78,9 +74,9 @@ let primes2 =
     let rec gen stream = seq {
         let next_prime = Seq.head stream
         yield next_prime
-//            let filtered_tail = Seq.filter (fun i -> i % next_prime <> 0I) (Seq.tail stream)
-        let filtered_tail = stream |> Seq.tail |> Seq.filter (fun i -> i % next_prime <> 0I)
-        yield! gen filtered_tail
+//        let filtered_tail = Seq.filter (fun i -> i % next_prime <> 0I) (Seq.tail stream)
+//        let filtered_tail = stream |> Seq.tail |> Seq.filter (fun i -> i % next_prime <> 0I)
+        yield! stream |> Seq.tail |> Seq.filter (fun i -> i % next_prime <> 0I) |> gen
     }
         
     gen (Seq.skip 1 integers)
@@ -202,7 +198,7 @@ let rec pi_terms1 n =
     
 print20 "pi terms" (pi_terms1 1.0)
 
-let pi_terms = Seq.unfold (fun n -> Some (1.0 / float n, if n < 0 then -n + 2 else -n - 2)) 1
+let pi_terms = Seq.unfold (fun n -> Some (1.0 / n, if n < 0.0 then -n + 2.0 else -n - 2.0)) 1.0
 
 print20 "pi_terms" pi_terms
 
@@ -223,7 +219,7 @@ let rec euler_transform2 (stream: float seq) = seq {
 
 print20 "euler transform of pi stream" (euler_transform2 pi_stream)
 
-seq { 1 .. 100 } |> Seq.triplewise |> print20 "triples"
+seq { 1 .. 30 } |> Seq.triplewise |> print20 "triples"
 
 let euler_transform source =
     source
@@ -232,27 +228,12 @@ let euler_transform source =
 
 print20 "euler transform of pi stream" (euler_transform pi_stream)
 
-//module Seq =
-//    let triplewise (source: seq<_>) = seq {
-//        use enumerator = source.GetEnumerator()
-//        if enumerator.MoveNext() then
-//            let mutable first = enumerator.Current
-//            if enumerator.MoveNext() then
-//                let mutable second = enumerator.Current
-//                while enumerator.MoveNext() do
-//                    let third = enumerator.Current
-//                    yield (first, second, third)
-//                    first <- second
-//                    second <- third
-//    }
-
-
 let rec make_tableau (transform: float seq -> float seq) (source: float seq) = seq {
     yield source
     yield! make_tableau transform (transform source)
 }
 
-let accelerated_sequence transform stream =
-    stream |> make_tableau transform |> Seq.map Seq.head
+let accelerated_sequence transform source =
+    source |> make_tableau transform |> Seq.map Seq.head
     
 print 10 "accelerated sequence of pi stream" (accelerated_sequence euler_transform pi_stream)
